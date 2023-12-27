@@ -1,6 +1,10 @@
-name: build-test-deploy
+name: prod-build-test-deploy
 
-on: push
+on:
+  pull_request:
+    branches: 
+      - main
+    types: [closed]
 
 jobs: 
   build:
