@@ -1,6 +1,10 @@
-name: build-test-deploy
+name: staging-build-test-deploy
 
-on: push
+on:
+  pull_request:
+    branches: 
+      - staging
+    types: [closed]
 
 jobs: 
   build:
@@ -17,7 +21,7 @@ jobs:
       - run: npm run build 
 
   test: 
-    needs: build
+    needs: build # make it waiting for build job
 
     runs-on: ubuntu-latest
 
@@ -32,16 +36,16 @@ jobs:
       - run: npm test
 
   deploy:
-    needs: test
+    needs: test  # make it waiting for test job
 
-    permissions:
+    permissions: # cause we write something we need permission
       contents: write
       pages: write     
       id-token: write  
 
-    environment:
-      name: production
-      url: ${{ steps.deployment.outputs.page_url }}
+    environment: # deployment for this env may be we can deploy many env
+      name: staging
+      url: ${{ steps.deployment.outputs.page_url }} # get value from deployment step
     
     runs-on: ubuntu-latest
     
@@ -64,6 +68,6 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with: 
           path: './out'
-      - name: deploy
-        id: deployment
+      - name: deploy 
+        id: deployment # for reference output of this step
         uses: actions/deploy-pages@v1
